@@ -1,0 +1,44 @@
+input[type=text], textarea {
+    width: 100%; /* Full width */
+    padding: 9px; /* Some padding */ 
+    box-sizing: border-box; /* Make sure that padding and width stays in place */
+    margin-bottom: 0.75px; /* Bottom margin */
+  }
+  
+  /* Style the submit button with a specific background color etc */
+  button {
+    align-items:center;
+    background-color: #04AA6D;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: x-large;
+  }
+  
+  /* When moving the mouse over the submit button, add a darker green color */
+  button:hover {
+    background-color: #45a049;
+  }
+
+.center-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+  .stButton > button {
+    width: 80%; 
+    height: 50px;
+    max-width: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+  
+  /* Hide Streamlit Branding */
+  #MainMenu {visibility: hidden;}
+  footer {visibility: hidden;}
+  header {visibility: hidden;}

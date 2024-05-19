@@ -24,16 +24,24 @@ def validate_input(user_input):
                 inputs.append(None)
     return inputs, errors
 
+
 # Load the scaler
 with open('../ml_dev/scaler.pkl', 'rb') as file:
     scaler = pickle.load(file)
 
 st.set_page_config(page_title="Pollutant Predictor", page_icon=":lungs:", layout="wide")
 
+# Use local CSS
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+local_css("assets/style.css")
+
 left, _, right = st.columns(3)
 with left:
     with st.container():
-        st.title("Air Quality Predictor")
+        st.title("Air Quality Predictor", anchor=False)
         
         st.caption(f"Based on [De Vito et al. (2008)]({constants.INTRO_PAPER})")
         st.caption(f"[Data Source]({constants.DATA_SOURCE})")
@@ -45,21 +53,22 @@ with open("assets/animation.json", "r") as f:
 
 with st.container():
 
-    st.subheader("Enter the values for the features to predict the next hour's air quality.")
-
-    with st.container():
-        st.write("---")
+    st.header("Enter the values for the features to predict the next hour's air quality.", divider='blue', anchor=False)
     
     left_column, right_column = st.columns(2)
 
     with left_column:
-        st.subheader("Feature values for the current hour:")
+        st.subheader("Feature values for the current hour:", anchor=False)
         # input fields for each feature
         user_input = {}
         for feature, desc in constants.FEATURES.items():
             user_input[feature] = st.text_input(f'{desc}', placeholder=f"e.g., {constants.FEATURES_MEAN[feature]}")
 
-        if st.button("Predict!"):
+
+    st.markdown('<div class="center-button">', unsafe_allow_html=True)
+    with right_column:    
+        if st.button("Predict values for the next hour!"):
+            
             input_vals, errors = validate_input(user_input)
             if errors:
                 for error in errors:
@@ -81,10 +90,10 @@ with st.container():
                 outputs = np.insert(outputs, 10, y_pred[:, 10], axis=1)
                 print(outputs)
 
-                with right_column:
-                    st.subheader("Predicted values for the next hour:")
-                    for feature in constants.FEATURES_ORDERED:
-                        val = outputs.reshape(len(constants.FEATURES))[constants.FEATURES_UNORDERED.index(feature)]
-                        st.write("")
-                        st.success(f"{re.sub(r'^True h', 'H', constants.FEATURES[feature])}: {val:.3f}")
-        
+                #st.subheader("Predicted values for the next hour:", anchor=False)
+                for feature in constants.FEATURES_ORDERED:
+                    val = outputs.reshape(len(constants.FEATURES))[constants.FEATURES_UNORDERED.index(feature)]
+                    st.write("")
+                    st.success(f"{re.sub(r'^True h', 'H', constants.FEATURES[feature])}: {val:.3f}")
+
+        st.markdown('</div>', unsafe_allow_html=True)
