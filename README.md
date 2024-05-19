@@ -1,7 +1,7 @@
 # :cloud: Air Quality Predictor :cloud:
 A web app to predict the next hour's air quality, given this hour's pollutant and air quality features!
 
-- EDA, data pre-processing, and model training details are available in /ml_dev
+- EDA, data pre-processing, and model training details are available in healthscope-assessment/ml_dev
 - Utilises a stacked LSTM autoencoder model to perform predictions
   
 ## Usage
@@ -12,7 +12,7 @@ git clone https://github.com/Dillonwong12/healthscope-assessment.git
 
 2. Change to the /app directory
 ```bash
-cd app
+cd healthscope-assessment/app
 ```
 
 3. Build the docker image
