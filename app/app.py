@@ -1,9 +1,11 @@
 import streamlit as st
+from streamlit_lottie import st_lottie
 import pickle
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 import numpy as np
 import re
+import json
 
 import constants
 
@@ -28,16 +30,22 @@ with open('../ml_dev/scaler.pkl', 'rb') as file:
 
 st.set_page_config(page_title="Pollutant Predictor", page_icon=":lungs:", layout="wide")
 
+left, _, right = st.columns(3)
+with left:
+    with st.container():
+        st.title("Air Quality Predictor")
+        
+        st.caption(f"Based on [De Vito et al. (2008)]({constants.INTRO_PAPER})")
+        st.caption(f"[Data Source]({constants.DATA_SOURCE})")
+
+
+with open("assets/animation.json", "r") as f:
+    with right:
+        st_lottie(json.load(f), height=250, width=250)
+
 with st.container():
-    st.title("Air Quality Predictor")
-    
-    st.write(f"Based on [De Vito et al. (2008)]({constants.INTRO_PAPER})")
-    st.write(f"[Data Source]({constants.DATA_SOURCE})")
 
-
-with st.container():
-
-    st.write("Enter the values for the features to predict the next hour's air quality.")
+    st.subheader("Enter the values for the features to predict the next hour's air quality.")
 
     with st.container():
         st.write("---")
@@ -45,7 +53,7 @@ with st.container():
     left_column, right_column = st.columns(2)
 
     with left_column:
-        st.write("Feature values for the current hour:")
+        st.subheader("Feature values for the current hour:")
         # input fields for each feature
         user_input = {}
         for feature, desc in constants.FEATURES.items():
@@ -74,8 +82,9 @@ with st.container():
                 print(outputs)
 
                 with right_column:
-                    st.write("Predicted values for the next hour:")
+                    st.subheader("Predicted values for the next hour:")
                     for feature in constants.FEATURES_ORDERED:
                         val = outputs.reshape(len(constants.FEATURES))[constants.FEATURES_UNORDERED.index(feature)]
-                        st.write(f"{re.sub(r'^True h', 'H', constants.FEATURES[feature])}: {val}")
+                        st.write("")
+                        st.success(f"{re.sub(r'^True h', 'H', constants.FEATURES[feature])}: {val:.3f}")
         
