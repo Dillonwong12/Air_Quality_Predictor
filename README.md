@@ -1,6 +1,8 @@
 # :cloud: Air Quality Predictor :cloud:
 A web app to predict the next hour's air quality, given this hour's pollutant and air quality features!
 
+![](https://github.com/Dillonwong12/healthscope-assessment/blob/main/app/assets/air_quality_predictor.gif)
+
 - EDA, data pre-processing, and model training details are available in healthscope-assessment/ml_dev
 - Utilises a stacked LSTM autoencoder model to perform predictions
   
