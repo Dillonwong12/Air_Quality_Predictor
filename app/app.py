@@ -26,7 +26,7 @@ def validate_input(user_input):
 
 
 # Load the scaler
-with open('../ml_dev/scaler.pkl', 'rb') as file:
+with open('models/scaler.pkl', 'rb') as file:
     scaler = pickle.load(file)
 
 st.set_page_config(page_title="Pollutant Predictor", page_icon=":lungs:", layout="wide")
@@ -75,7 +75,7 @@ with st.container():
                     with right_column:
                         st.error(error)
             else:
-                model = tf.keras.models.load_model('../ml_dev/lstm_autoencoder.h5')
+                model = tf.keras.models.load_model('models/lstm_autoencoder.h5')
                 print(f"input vals: {input_vals}")
                 input_vals = np.array(input_vals).reshape(1, -1)
                 rh = input_vals[:, 10].reshape(-1, 1) 
