@@ -1,7 +1,8 @@
 INTRO_PAPER = "https://www.researchgate.net/publication/235641830_On_field_calibration_of_an_electronic_nose_for_benzene_estimation_in_an_urban_pollution_monitoring_scenario"
 DATA_SOURCE = "https://archive.ics.uci.edu/dataset/360/air+quality"
 
-FEATURES_ORDERED = ["co_gt", "s1_co", "c6h6_gt", "s2_nhmc", "nox_gt", "s3_nox", "no2_gt", "s4_no2", "s5_o3", "temp", "rh", "ah"]
+FEATURES_ORDERED = ["co_gt", "c6h6_gt", "nox_gt", "no2_gt", "s1_co", "s2_nhmc",  "s3_nox",  "s4_no2", "s5_o3", "temp", "rh", "ah"]
+FEATURES_UNORDERED = ["co_gt", "s1_co", "c6h6_gt", "s2_nhmc", "nox_gt", "s3_nox", "no2_gt", "s4_no2", "s5_o3", "temp", "rh", "ah"]
 FEATURES = {"co_gt": "True hourly averaged CO (mg/m³)", 
             "c6h6_gt": "True hourly averaged Benzene (µg/m³)", 
             "nox_gt": "True hourly averaged NOₓ concentration (ppb)",

@@ -3,14 +3,28 @@ import pickle
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
 import numpy as np
+import re
+
 import constants
+
+def validate_input(user_input):
+    errors = []
+    inputs = []
+    for f in constants.FEATURES_UNORDERED:
+        if f not in user_input or user_input[f].strip() == "":
+            errors.append(f"{constants.FEATURES[f]} is required.")
+            inputs.append(None)
+        else:
+            try:
+                inputs.append(float(user_input[f]))
+            except ValueError:
+                errors.append(f"{constants.FEATURES[f]} must be a number.")
+                inputs.append(None)
+    return inputs, errors
 
 # Load the scaler
 with open('../ml_dev/scaler.pkl', 'rb') as file:
     scaler = pickle.load(file)
-
-model = tf.keras.models.load_model('../ml_dev/lstm_autoencoder.h5')
-
 
 st.set_page_config(page_title="Pollutant Predictor", page_icon=":lungs:", layout="wide")
 
@@ -23,33 +37,45 @@ with st.container():
 
 with st.container():
 
+    st.write("Enter the values for the features to predict the next hour's air quality.")
 
-    st.write("Enter the values for the features to predict the next day's air quality.")
+    with st.container():
+        st.write("---")
+    
+    left_column, right_column = st.columns(2)
 
-    # input fields for each feature
-    user_input = {}
-    for feature, desc in constants.FEATURES.items():
-        user_input[feature] = st.text_input(f'{desc}', placeholder=f"e.g., {constants.FEATURES_MEAN[feature]}")
+    with left_column:
+        st.write("Feature values for the current hour:")
+        # input fields for each feature
+        user_input = {}
+        for feature, desc in constants.FEATURES.items():
+            user_input[feature] = st.text_input(f'{desc}', placeholder=f"e.g., {constants.FEATURES_MEAN[feature]}")
 
+        if st.button("Predict!"):
+            input_vals, errors = validate_input(user_input)
+            if errors:
+                for error in errors:
+                    with right_column:
+                        st.error(error)
+            else:
+                model = tf.keras.models.load_model('../ml_dev/lstm_autoencoder.h5')
+                print(f"input vals: {input_vals}")
+                input_vals = np.array(input_vals).reshape(1, -1)
+                rh = input_vals[:, 10].reshape(-1, 1) 
+                input_vals = scaler.transform(input_vals[:, [i for i in range(input_vals.shape[1]) if i != 10]])
+                input_vals = np.insert(input_vals, 10, rh/100, axis=1)
+                input_arr = input_vals.reshape((1, 1, 12))
 
-    if st.button("Predict"):
-        inputs = []
-        for f in constants.FEATURES_ORDERED:
-            inputs.append(float(user_input[f]))
-        input_vals = np.array(inputs).reshape(1, -1)
-        rh = input_vals[:, 10].reshape(-1, 1) 
-        input_vals = scaler.transform(input_vals[:, [i for i in range(input_vals.shape[1]) if i != 10]])
-        input_vals = np.insert(input_vals, 10, rh/100, axis=1)
-        input_arr = input_vals.reshape((1, 1, 12))
+                y_pred = model.predict(input_arr).reshape(-1, 12)
+                # scale features except rh
+                input_to_invert = y_pred[:, [i for i in range(y_pred.shape[1]) if i != 10]]
+                outputs = scaler.inverse_transform(input_to_invert)
+                outputs = np.insert(outputs, 10, y_pred[:, 10], axis=1)
+                print(outputs)
 
-        y_pred = model.predict(input_arr).reshape(-1, len(constants.FEATURES))
-        # scale features except rh
-        input_to_invert = y_pred[:, [i for i in range(y_pred.shape[1]) if i != 10]]
-        outputs = scaler.inverse_transform(input_to_invert)
-        outputs = np.insert(outputs, 10, y_pred[:, 10], axis=1)
-        print(outputs)
-
-        st.write("Predicted values for the next day:")
-        for feature, val in zip(constants.FEATURES.values(), outputs.reshape(len(constants.FEATURES))):
-            st.write(f"{feature}: {val}")
+                with right_column:
+                    st.write("Predicted values for the next hour:")
+                    for feature in constants.FEATURES_ORDERED:
+                        val = outputs.reshape(len(constants.FEATURES))[constants.FEATURES_UNORDERED.index(feature)]
+                        st.write(f"{re.sub(r'^True h', 'H', constants.FEATURES[feature])}: {val}")
         
